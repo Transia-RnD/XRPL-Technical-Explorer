@@ -35,7 +35,7 @@
               <li><a class="dropdown-item" href="#">Something else here</a></li>
             </ul>
           </li> -->
-          <li class="nav-item dropdown">
+          <!-- <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-bs-toggle="dropdown" aria-expanded="false">{{ nodeSelectLabel }}</a>
             <ul class="dropdown-menu shadow" aria-labelledby="dropdown01">
               <li><a class="dropdown-item" href="https://explorer.xrplf.org"><b>Mainnet</b></a></li>
@@ -43,7 +43,7 @@
               <li><a class="dropdown-item" href="https://hooks-testnet-explorer.xrpl-labs.com">Hooks Testnet V1</a></li>
               <li><a class="dropdown-item" href="https://hooks-testnet-v2-explorer.xrpl-labs.com">Hooks Testnet V2</a></li>
             </ul>
-          </li>
+          </li> -->
           <li class="nav-item">
             <a class="nav-link" style="white-space: nowrap;" href="https://github.com/XRPLF/XRPL-Technical-Explorer" target="_blank"><i class="fab fa-github-square"></i><span class="ps-2">Source</span></a>
           </li>
