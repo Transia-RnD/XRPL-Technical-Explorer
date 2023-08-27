@@ -1,10 +1,10 @@
 <template>
-  <nav class="navbar navbar-expand-lg fixed-top" :class="{
-    'navbar-dark bg-blue': nodeSelectLabel.match(/XRPL.*Main/),
-    'navbar-dark bg-success': nodeSelectLabel.match(/XRPL.*Test/),
+  <nav class="navbar navbar-expand-lg fixed-top navbar-dark" :class="{
+    'bg-blue': nodeSelectLabel.match(/Main/),
+    'bg-success': nodeSelectLabel.match(/Test/),
     'navbar-dark bg-info': nodeSelectLabel.match(/Xahau.*Main/),
     'navbar-dark bg-danger': nodeSelectLabel.match(/Xahau.*Test/),
-    'bg-warning navbar-light': $router.options.endpoint !== ''
+    'bg-info': nodeSelectLabel.match(/Local|custom-node/)
   }" aria-label="Main navigation">
     <div class="container-fluid">
       <router-link class="nes nav navbar-brand" to="/">
@@ -20,8 +20,9 @@
           <li class="nav-item dropdown" v-if="$router.options.endpoint === ''">
             <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-bs-toggle="dropdown" aria-expanded="false">{{ nodeSelectLabel }}</a>
             <ul class="dropdown-menu shadow" aria-labelledby="dropdown01">
-              <li><a class="dropdown-item" href="https://explorer.xrplf.org"><b>XRPL Mainnet</b></a></li>
-              <li><a class="dropdown-item" href="https://explorer-testnet.xrplf.org">XRPL Testnet</a></li>
+              <li><a class="dropdown-item" href="http://localhost:4000"><b>Localhost (:6006)</b></a></li>
+              <li><a class="dropdown-item" href="https://explorer.xrplf.org"><b>Mainnet</b></a></li>
+              <li><a class="dropdown-item" href="https://explorer-testnet.xrplf.org">Testnet</a></li>
               <li><a class="dropdown-item" href="https://explorer.xahau.network"><b>Xahau Mainnet</b></a></li>
               <li><a class="dropdown-item" href="https://explorer.xahau-test.net">Xahau Testnet</a></li>
             </ul>
@@ -31,6 +32,9 @@
           </li>
           <li class="nav-item">
             <a class="nav-link" style="white-space: nowrap;" href="https://github.com/XRPLF/XRPL-Technical-Explorer" target="_blank"><i class="fab fa-github-square"></i><span class="ps-2">Source</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" style="white-space: nowrap;" href="/command" target="_blank"><i class="fa-solid fa-webhook"></i><span class="ps-2">Commands</span></a>
           </li>
         </ul>
         <form class="d-flex" @submit="search">
@@ -60,13 +64,16 @@ export default {
       if (this.$net.test) {
         return 'XRPL Testnet (Change)'
       }
-      if (this.$net.xahaulive) {
+      if (this.$net.xahau) {
         return 'Xahau Mainnet (Change)'
       }
       if (this.$net.xahautest) {
         return 'Xahau Testnet (Change)'
       }
-      return 'XRPL Mainnet (Change)'
+      if (this.$net.local) {
+        return 'Local (Change)'
+      }
+      return 'Mainnet (Change)'
     },
     validQuery () {
       const commands = this.$router.options.routes.filter(r => {
