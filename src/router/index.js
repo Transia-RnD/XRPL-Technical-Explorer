@@ -1,146 +1,158 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
-import Ledger from '../views/Ledger.vue'
-import ResolveHash from '../components/ResolveHash.vue'
-import Transaction from '../views/Transaction.vue'
-import LedgerEntry from '../views/LedgerEntry.vue'
-import Account from '../views/Account.vue'
-import NotFound from '../views/NotFound.vue'
-import CustomCommand from '../views/CustomCommand.vue'
-import GenericData from '../components/GenericData.vue'
-import { groupedCommands } from '../plugins/commands'
+import Vue from "vue";
+import VueRouter from "vue-router";
+import Home from "../views/Home.vue";
+import Ledger from "../views/Ledger.vue";
+import ResolveHash from "../components/ResolveHash.vue";
+import Transaction from "../views/Transaction.vue";
+import LedgerEntry from "../views/LedgerEntry.vue";
+import Account from "../views/Account.vue";
+import NotFound from "../views/NotFound.vue";
+import CustomCommand from "../views/CustomCommand.vue";
+import HookNamespace from "../views/HookNamespace.vue";
+import GenericData from "../components/GenericData.vue";
+import { groupedCommands } from "../plugins/commands";
 
-const gcom = groupedCommands.flatMap(group => group.items).reduce((acc, item) => {
-  acc[item.name] = item.json
-  return acc
-}, {})
+const gcom = groupedCommands
+  .flatMap((group) => group.items)
+  .reduce((acc, item) => {
+    acc[item.name] = item.json;
+    return acc;
+  }, {});
 
-Vue.use(VueRouter)
+Vue.use(VueRouter);
 
 const routes = [
   {
-    path: '/',
-    name: 'home',
-    component: Home
+    path: "/",
+    name: "home",
+    component: Home,
   },
   {
-    path: '/:ledger([0-9]{1,20})',
-    name: 'ledger',
-    component: Ledger
+    path: "/:ledger([0-9]{1,20})",
+    name: "ledger",
+    component: Ledger,
   },
   {
-    path: '/tx/:hash([a-fA-F0-9]{64})',
-    name: 'transaction',
-    component: Transaction
+    path: "/tx/:hash([a-fA-F0-9]{64})",
+    name: "transaction",
+    component: Transaction,
   },
   {
-    path: '/:hash([a-fA-F0-9]{16})', // CTID
-    name: 'ctid',
-    component: Transaction
+    path: "/:hash([a-fA-F0-9]{16})", // CTID
+    name: "ctid",
+    component: Transaction,
   },
   {
-    path: '/entry/:hash([a-fA-F0-9]{64})',
-    name: 'ledgerentry',
-    component: LedgerEntry
+    path: "/entry/:hash([a-fA-F0-9]{64})",
+    name: "ledgerentry",
+    component: LedgerEntry,
   },
   {
-    path: '/:account(r[a-zA-Z0-9]{15,})',
-    name: 'account',
+    path: "/:account(r[a-zA-Z0-9]{15,})",
+    name: "account",
     component: Account,
     children: [
       {
-        name: 'account_tx',
-        path: 'tx',
+        name: "account_tx",
+        path: "tx",
         component: GenericData,
         meta: {
-          title: 'Transactions',
-          element: 'transactions',
-          map: 'tx'
-        }
+          title: "Transactions",
+          element: "transactions",
+          map: "tx",
+        },
       },
       {
-        name: 'account_lines',
-        path: 'lines',
+        name: "account_lines",
+        path: "lines",
         component: GenericData,
         meta: {
-          title: 'Account (Trust) Lines',
-          element: 'lines',
-          map: ''
-        }
+          title: "Account (Trust) Lines",
+          element: "lines",
+          map: "",
+        },
       },
       {
-        name: 'account_nfts',
-        path: 'nfts',
+        name: "account_nfts",
+        path: "nfts",
         component: GenericData,
         meta: {
-          title: 'Account NFTs',
-          element: 'account_nfts',
-          map: ''
-        }
+          title: "Account NFTs",
+          element: "account_nfts",
+          map: "",
+        },
       },
       {
-        name: 'account_objects',
-        path: 'objects',
+        name: "account_objects",
+        path: "objects",
         component: GenericData,
         meta: {
-          title: 'Account (Ledger) Objects',
-          element: 'account_objects',
-          map: ''
-        }
+          title: "Account (Ledger) Objects",
+          element: "account_objects",
+          map: "",
+        },
       },
       {
-        name: 'account_offers',
-        path: 'offers',
+        name: "account_offers",
+        path: "offers",
         component: GenericData,
         meta: {
-          title: 'Account (DEX) Offers',
-          element: 'offers',
-          map: ''
-        }
-      }
-    ]
+          title: "Account (DEX) Offers",
+          element: "offers",
+          map: "",
+        },
+      },
+      {
+        path: "/account_namespace/:account(r[a-zA-Z0-9]{15,})/:namespace_id([a-fA-F0-9]{64})",
+        name: "account_namespace",
+        component: HookNamespace,
+      },
+    ],
   },
   {
-    path: '/:hash([a-fA-F0-9]{64})',
-    name: 'hash',
-    component: ResolveHash
+    path: "/:hash([a-fA-F0-9]{64})",
+    name: "hash",
+    component: ResolveHash,
   },
   {
-    path: '/command',
-    name: 'custom_command',
-    component: CustomCommand
+    path: "/command",
+    name: "custom_command",
+    component: CustomCommand,
   },
-  ...groupedCommands.flatMap((group) => group.items.map(command => {
-    return {
-      path: '/' + command.name,
-      name: 'command_' + command.name,
-      component: CustomCommand,
-      meta: {
-        isPublicCommand: true,
-        template: gcom[command.name]
-      }
-    }
-  })),
+  ...groupedCommands.flatMap((group) =>
+    group.items.map((command) => {
+      return {
+        path: "/" + command.name,
+        name: "command_" + command.name,
+        component: CustomCommand,
+        meta: {
+          isPublicCommand: true,
+          template: gcom[command.name],
+        },
+      };
+    })
+  ),
   {
-    path: '/404',
-    alias: '*',
-    name: 'notfound',
-    component: NotFound
-  }
-]
+    path: "/404",
+    alias: "*",
+    name: "notfound",
+    component: NotFound,
+  },
+];
 
-let routerBasePrefix = ''
-const endpointRegex = window.location.href.match(/\/(ws[s]{0,1}:[a-zA-Z0-9-\\.:\\[\]]+[:0-9]{0,})/)
+let routerBasePrefix = "";
+const endpointRegex = window.location.href.match(
+  /\/(ws[s]{0,1}:[a-zA-Z0-9-\\.:\\[\]]+[:0-9]{0,})/
+);
 if (endpointRegex) {
-  routerBasePrefix = endpointRegex[1]
+  routerBasePrefix = endpointRegex[1];
 }
 
 const router = new VueRouter({
-  mode: 'history',
+  mode: "history",
   base: process.env.BASE_URL + routerBasePrefix,
   routes,
-  endpoint: routerBasePrefix.replace(/^(ws[s]{0,1}:)/, '$1//')
-})
+  endpoint: routerBasePrefix.replace(/^(ws[s]{0,1}:)/, "$1//"),
+});
 
-export default router
+export default router;
