@@ -11,13 +11,13 @@ export default {
     Vue.prototype.$ws = new XrplClient(endpoint);
 
     const net = {
-      live:
+      xrpl:
         endpoint === "" ||
         endpoint.match(/xrplcluster|xrpl\.ws|xrpl\.link|s[12]\.ripple\.com/),
-      test: endpoint.match(/rippletest|\/testnet\.xrpl-labs/),
-      xahaulive: endpoint.match(/xahau.*network/),
-      xahautest: endpoint.match(/xahau.*test/),
-      local: endpoint.match(/localhost|0.0.0.0/),
+      xrpl_test: endpoint.match(/rippletest|\/testnet\.xrpl-labs/),
+      xahau: endpoint.match(/xahau.network/),
+      xahau_test: endpoint.match(/xahau-test.network/),
+      local: endpoint.match(/localhost|0.0.0.0|custom-node/),
     };
 
     Vue.prototype.$net = net;
