@@ -11,7 +11,7 @@ export default {
       xrpl_test: endpoint.match(/rippletest|\/testnet\.xrpl-labs/),
       xahau: endpoint.match(/xahau.network/),
       xahau_test: endpoint.match(/xahau-test.net/),
-      local: endpoint.match(/localhost|0.0.0.0|custom-node/)
+      local: endpoint.match(/localhost|127.0.0.1|custom-node/)
     }
 
     Vue.prototype.$net = net
