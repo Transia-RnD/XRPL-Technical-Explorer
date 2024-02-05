@@ -64,7 +64,7 @@ export default {
       if (this.$net.test) {
         return 'XRPL Testnet (Change)'
       }
-      if (this.$net.xahau) {
+      if (this.$net.xahaulive) {
         return 'Xahau Mainnet (Change)'
       }
       if (this.$net.xahautest) {
