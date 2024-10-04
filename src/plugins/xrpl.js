@@ -5,13 +5,12 @@ export default {
     Vue.prototype.$ws = new XrplClient(process?.env?.VUE_APP_WSS_ENDPOINT)
 
     const endpoint = String(process?.env?.VUE_APP_WSS_ENDPOINT || '')
-
     const net = {
       xrpl: endpoint === '' || endpoint.match(/xrplcluster|xrpl\.ws|xrpl\.link|s[12]\.ripple\.com/),
       xrpl_test: endpoint.match(/rippletest|\/testnet\.xrpl-labs/),
       xahau: endpoint.match(/xahau.network/),
       xahau_test: endpoint.match(/xahau-test.net/),
-      local: endpoint.match(/localhost|127.0.0.1|custom-node/)
+      local: endpoint.match(/localhost|127.0.0.1|custom-node|[A-Za-z0-9]+/)
     }
 
     Vue.prototype.$net = net

@@ -26,6 +26,7 @@
             <div class="d-block text-end">
               <button @click="prepare()" :disabled="loading" :class="{ 'is-success': !loading, 'is-disabled': loading }" class="m-3 nes-btn nes"><i class="fas fa-rocket-launch me-2" style="position: relative; top: -3px"></i>Refresh</button>
               <button @click="get()" :disabled="loading" :class="{ 'is-success': !loading, 'is-disabled': loading }" class="m-3 nes-btn nes"><i class="fas fa-rocket-launch me-2" style="position: relative; top: -3px"></i>Execute</button>
+              <button @click="toggleSubmit()" :class="{ 'is-success': submit, 'is-disabled': loading }" class="m-3 nes-btn nes">{{ submit ? 'Submit: ON' : 'Submit: OFF' }}</button>
             </div>
             <div class="mt-2">
               <Loading v-if="loading" />
@@ -39,29 +40,39 @@
           </div>
         </div>
       </div>
+      <div class="col-3 scrollable-section">
+        <div class="list-group">
+          <div v-if="accounts.length > 0">
+            <h5 class="nes blue">Select an Account</h5>
+            <ul class="list-unstyled">
+              <li v-for="(account, index) in accounts" :key="account">
+                <button
+                  @click="selectAccount(index)"
+                  class="nes-btn py-0 mb-2"
+                  :class="{ 'is-success': deriveIndex === index }"
+                >
+                  {{ index }}: {{ account.substring(0, 10) }}...
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 </template>
-<style lang="scss" scoped>
-.scrollable-section {
-  max-height: 100vh; /* Adjust this value according to your needs */
-  overflow-y: auto;
-}
-</style>
+
 <script>
 import TransportWebUSB from '@ledgerhq/hw-transport-webusb'
 import Xrp from '@ledgerhq/hw-app-xrp'
 import { codemirror } from 'vue-codemirror'
 import Loading from '../components/Loading.vue'
-import { groupedCommands } from '../plugins/commands'
+import JsonRenderer from '../components/JsonRenderer.vue'
 
 import 'codemirror/lib/codemirror.css'
-import JsonRenderer from '../components/JsonRenderer.vue'
 import 'codemirror/theme/monokai.css'
 import 'codemirror/addon/lint/lint.css'
-
 import jsonlint from 'jsonlint-mod'
-
 import 'codemirror/mode/javascript/javascript.js'
 import 'codemirror/addon/lint/lint.js'
 import 'codemirror/addon/lint/json-lint.js'
@@ -92,9 +103,12 @@ export default {
       },
       loading: false,
       publicKey: null,
+      selectedAccount: null,
+      deriveIndex: 0,
+      accounts: [],
       data: {},
       errorResponse: false,
-      groupedCommands: groupedCommands
+      submit: true
     }
   },
   computed: {
@@ -117,21 +131,46 @@ export default {
   methods: {
     async prepare () {
       try {
-        const derive = 0
-        const transport = await TransportWebUSB.create()
-        const xrp = new Xrp(transport)
-        const { publicKey, address } = await xrp.getAddress(`44'/144'/${derive}'/0/0`, false)
-        this.publicKey = publicKey
-        this.command = JSON.stringify({
-          TransactionType: 'Payment',
-          Account: address,
-          Amount: '1000000',
-          Destination: 'r223rsyz1cfqPbjmiX6oYu1hFgNwCkWZH'
-        }, null, 2)
+        this.loading = true
+        await this.listAccounts()
         this.data = {}
         this.loading = false
         this.errorResponse = false
       } catch (error) {
+        this.data = { error: error.message }
+        this.loading = false
+        this.marker = null
+        this.errorResponse = true
+      }
+    },
+    async selectAccount (index) {
+      this.selectedAccount = this.accounts[index]
+      this.deriveIndex = index
+      const transport = await TransportWebUSB.create()
+      const xrp = new Xrp(transport)
+      const { publicKey, address } = await xrp.getAddress(`44'/144'/${this.deriveIndex}'/0/0`, false)
+      this.publicKey = publicKey
+      this.selectedAccount = address
+      this.command = JSON.stringify({
+        TransactionType: 'Payment',
+        Account: this.selectedAccount,
+        Amount: '1000000',
+        Destination: 'r223rsyz1cfqPbjmiX6oYu1hFgNwCkWZH'
+      }, null, 2)
+    },
+    async listAccounts () {
+      try {
+        const transport = await TransportWebUSB.create()
+        const xrp = new Xrp(transport)
+        const accounts = []
+        for (let i = 0; i < 5; i++) {
+          const { address } = await xrp.getAddress(`44'/144'/${i}'/0/0`, false)
+          accounts.push(address)
+        }
+        this.accounts = accounts
+        this.selectAccount(0)
+      } catch (error) {
+        console.log(error)
         this.data = { error: error.message }
         this.loading = false
         this.marker = null
@@ -154,14 +193,20 @@ export default {
       }
 
       try {
-        const derive = 0
         const transport = await TransportWebUSB.create()
         const xrp = new Xrp(transport)
         const cloneTx = customCommand
 
-        // For Ledger Depricated Flags
+        // For Ledger Deprecated Flags
         cloneTx.Flags = 2147483648
         const accountResponse = await this.$ws.send({ command: 'account_info', account: cloneTx.Account })
+        if (accountResponse.error) {
+          this.data = { error: accountResponse.error }
+          this.loading = false
+          this.marker = null
+          this.errorResponse = true
+          return
+        }
         cloneTx.Sequence = accountResponse.account_data.Sequence
         cloneTx.NetworkID = this.$ws.serverInfo.result.info.network_id
         cloneTx.LastLedgerSequence = this.$ws.serverInfo.result.info.validated_ledger.seq + 20
@@ -169,23 +214,31 @@ export default {
         cloneTx.SigningPubKey = ''
         const feeResponse = await this.$ws.send({ command: 'fee', tx_blob: encode(cloneTx) })
         const fTx = { ...cloneTx }
-        const { publicKey } = await xrp.getAddress(`44'/144'/${derive}'/0/0`, false)
+        const { publicKey } = await xrp.getAddress(`44'/144'/${this.deriveIndex}'/0/0`, false)
         fTx.SigningPubKey = publicKey.toUpperCase()
         fTx.Fee = feeResponse.fee_hooks_feeunits
         const signature = await xrp.signTransaction(
-          `44'/144'/${derive}'/0/0`,
+          `44'/144'/${this.deriveIndex}'/0/0`,
           encode(fTx)
         )
         fTx.TxnSignature = signature
-        const response = await this.$ws.send({ command: 'submit', tx_blob: encode(fTx) })
-        this.loading = false
-        this.data = response
+        if (this.submit) {
+          const response = await this.$ws.send({ command: 'submit', tx_blob: encode(fTx) })
+          this.loading = false
+          this.data = response
+        } else {
+          this.data = fTx
+          this.loading = false
+        }
       } catch (error) {
         this.data = { error: error.message }
         this.loading = false
         this.marker = null
         this.errorResponse = true
       }
+    },
+    toggleSubmit () {
+      this.submit = !this.submit
     }
   },
   async mounted () {

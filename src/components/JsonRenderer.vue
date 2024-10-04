@@ -107,6 +107,16 @@ export default {
           })
         }
       }
+      console.log(this.data)
+      if (this.data?.TransactionType === 'Batch') {
+        if (this.data?.meta?.BatchExecutions) {
+          this.data.meta.BatchExecutions.forEach(execution => {
+            if (execution.BatchExecution?.InnerResult) {
+              execution.BatchExecution.InnerResult = Buffer.from(execution.BatchExecution.InnerResult, 'hex').toString()
+            }
+          })
+        }
+      }
 
       return Object.assign({}, {
         ...this.data,
