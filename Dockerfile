@@ -18,7 +18,7 @@ COPY --from=cloner /app/explorer /app
 RUN npm install
 
 ARG VUE_APP_WSS_ENDPOINT
-ENV VUE_APP_WSS_ENDPOINT $VUE_APP_WSS_ENDPOINT
+ENV VUE_APP_WSS_ENDPOINT=$VUE_APP_WSS_ENDPOINT
 RUN npm run build
 
 FROM nginx:alpine as production

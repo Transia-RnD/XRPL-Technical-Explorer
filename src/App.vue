@@ -44,7 +44,7 @@ export default {
       Styles by Tristan (screenshot)
     */
     .blue { color: #183FB7; }
-    .blue-border { border-color: lighten(#183FB7, 45%); }
+    .blue-border { border-color: #183FB7; }
     .blue-highlight { color: #7592F7; }
     .bg-blue { background-color: #183FB7; color: white; }
     .bg-purple { background-color: #6626EB; color: white; }
