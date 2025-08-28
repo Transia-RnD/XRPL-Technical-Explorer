@@ -138,7 +138,7 @@ export default {
       }
 
       try {
-        const response = await axios.post('http://localhost:9000/payload', customCommand)
+        const response = await axios.post('http://localhost:9001/payload', customCommand)
         this.loading = false
         this.data = response.data
         this.imageUrl = response.data.refs.qr_png

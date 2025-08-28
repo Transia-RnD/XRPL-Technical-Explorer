@@ -5,7 +5,7 @@ import 'dotenv/config'
 // import { AppLMDBService } from './libs/lmdb'
 
 const app = express()
-const port = 9000
+const port = 9001
 
 app.use(cors())
 app.use(express.json())
@@ -15,7 +15,20 @@ app.post('/payload', async (req: Request, res: Response) => {
   try {
     try {
       const xumm = new Xumm(process.env.XUMM_APIKEY, process.env.XUMM_APISECRET)
-      const payload = await xumm.payload?.create(req.body, true)
+      console.log(req.body);
+      
+      const payload = await xumm.payload?.create(
+        {
+          // options: {
+          //   multisign: true,
+          //   signers: ["r3qUnU8g5Kcy3rV7HigDfTA4wi6bcLhtTm"]
+          // },
+          txjson: {
+            ...req.body,
+          },
+        },
+        true
+      )
       res.json(payload)
     } catch (error) {
       // @ts-expect-error -- ignore
