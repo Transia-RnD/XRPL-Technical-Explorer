@@ -19,10 +19,10 @@ app.post('/payload', async (req: Request, res: Response) => {
       
       const payload = await xumm.payload?.create(
         {
-          // options: {
-          //   multisign: true,
-          //   signers: ["r3qUnU8g5Kcy3rV7HigDfTA4wi6bcLhtTm"]
-          // },
+          options: {
+            multisign: false,
+            signers: ["rPicqzcyoxw22XBrFCMAcFXYU2boeqYjm6"]
+          },
           txjson: {
             ...req.body,
           },
