@@ -190,3 +190,27 @@ export default {
 
 <style lang="scss" scoped>
 </style>
+
+<style lang="scss">
+.vjs-tree {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 13px;
+  color: #e2e8f0;
+  background-color: transparent;
+}
+.vjs-tree-node {
+  &:hover { background-color: rgba(56, 189, 248, 0.04); }
+  &.is-highlight { background-color: rgba(56, 189, 248, 0.08); }
+}
+.vjs-key { color: #38bdf8; }
+.vjs-value__string, .vjs-value-string { color: #34d399; }
+.vjs-value__number, .vjs-value-number { color: #fbbf24; }
+.vjs-value__boolean, .vjs-value-boolean { color: #a78bfa; }
+.vjs-value__null, .vjs-value-null { color: #f87171; }
+.vjs-comment { color: #64748b; }
+.vjs-tree-brackets { color: #64748b; &:hover { color: #38bdf8; } }
+.vjs-tree-node .vjs-indent-unit.has-line { border-left-color: #1e293b; }
+.vjs-carets { color: #64748b; &:hover { color: #38bdf8; } }
+.vjs-colon { color: #64748b; }
+.vjs-value { cursor: pointer; &:hover { text-decoration: underline; text-decoration-color: rgba(56, 189, 248, 0.3); } }
+</style>

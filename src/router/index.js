@@ -18,6 +18,7 @@ import IpfsPayload from '../views/IpfsPayload.vue'
 import IpfsViewer from '../views/IpfsViewer.vue'
 import IpnsViewer from '../views/IpnsViewer.vue'
 import GenericData from '../components/GenericData.vue'
+import InnerLedger from '../views/InnerLedger.vue'
 import { groupedCommands } from '../plugins/commands'
 
 const gcom = groupedCommands.flatMap(group => group.items).reduce((acc, item) => {
@@ -62,6 +63,11 @@ const routes = [
     path: '/wallets/ledger',
     name: 'wallets_ledger',
     component: LedgerPayload
+  },
+  {
+    path: '/inner/:seq([0-9]{1,20})',
+    name: 'inner_ledger',
+    component: InnerLedger
   },
   {
     path: '/:ledger([0-9]{1,20})',

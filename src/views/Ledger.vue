@@ -6,8 +6,8 @@
       </div>
     </div> -->
 
-    <h4 class="nes blue">Ledger</h4>
-    <code class="text-primary nes">{{ $route.params.ledger }}</code>
+    <h4 class="blue">Ledger</h4>
+    <code>{{ $route.params.ledger }}</code>
 
     <div v-if="selectedLedgerFetched">
       <div v-if="selectedLedger.error">

@@ -1,52 +1,14 @@
 <template>
-  <nav class="navbar navbar-expand-lg fixed-top navbar-dark" :class="{
-    'bg-purple': nodeSelectLabel.match(/Xrpl Mainnet/),
-    'bg-orange': nodeSelectLabel.match(/Xrpl Testnet/),
-    'bg-navy': nodeSelectLabel.match(/Xahau Mainnet/),
-    'bg-yellow': nodeSelectLabel.match(/Xahau Testnet/),
-    'bg-info': nodeSelectLabel.match(/Local|custom-node/)
-  }" aria-label="Main navigation">
+  <nav class="navbar navbar-expand-lg fixed-top navbar-dark" style="background: #0a0e1a; border-bottom: 1px solid #1e293b;" aria-label="Main navigation">
     <div class="container-fluid">
-      <router-link class="nes nav navbar-brand" to="/">
-        <span class="d-block d-md-none">XRPL <small>Explorer</small></span>
-        <span class="d-none d-md-block">XRP Ledger Explorer</span>
+      <router-link class="navbar-brand" to="/">
+        <span class="brand-text">XRPL <small>Explorer</small></span>
       </router-link>
-      <button class="navbar-toggler p-0 border-0" type="button" @click="navbarCollapsed = !navbarCollapsed" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
 
-      <div class="navbar-collapse offcanvas-collapse" :class="{open: navbarCollapsed}">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-bs-toggle="dropdown" aria-expanded="false">{{ nodeSelectLabel }}</a>
-            <ul class="dropdown-menu shadow" aria-labelledby="dropdown01">
-              <li><a class="dropdown-item" href="https://xahau.network">Xahau Mainnet</a></li>
-              <li><a class="dropdown-item" href="https://xahau-test.network">Xahau Testnet</a></li>
-              <li><a class="dropdown-item" href="https://explorer.xrplf.org"><b>Xrpl Mainnet</b></a></li>
-              <li><a class="dropdown-item" href="https://explorer-testnet.xrplf.org">Xrpl Testnet</a></li>
-              <li><a class="dropdown-item" href="http://localhost:4000"><b>Localhost (:6006)</b></a></li>
-            </ul>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" style="white-space: nowrap;" href="https://github.com/XRPLF/XRPL-Technical-Explorer" target="_blank"><i class="fab fa-github-square"></i><span class="ps-2">Source</span></a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" style="white-space: nowrap;" href="/command"><i class="fa-solid fa-webhook"></i><span class="ps-2">Commands</span></a>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-bs-toggle="dropdown" aria-expanded="false">Select Wallet</a>
-            <ul class="dropdown-menu shadow" aria-labelledby="dropdown01">
-              <li><a class="dropdown-item" href="/wallets/xumm">Xumm</a></li>
-              <li><a class="dropdown-item" href="/wallets/ledger">Ledger</a></li>
-            </ul>
-          </li>
-        </ul>
-        <form class="d-flex" @submit="search">
-          <input v-model="query" class="form-control border border-2 border-dark py-0 me-2" type="search" placeholder="Search" aria-label="Search">
-          <!-- <button class="btn btn-outline-success" type="submit">Search</button> -->
-          <button :disabled="!validQuery" type="submit" :class="{'is-success': validQuery, 'is-disabled': !validQuery}" class="py-0 px-2 nes-btn">Search</button>
-        </form>
-      </div>
+      <form class="d-flex ms-auto" @submit="search">
+        <input v-model="query" class="form-control py-0 me-2" type="search" placeholder="Search ledger, tx, account..." aria-label="Search" style="min-width: 280px;">
+        <button :disabled="!validQuery" type="submit" class="nes-btn py-0 px-3" :class="{'is-success': validQuery, 'is-disabled': !validQuery}">Search</button>
+      </form>
     </div>
   </nav>
 </template>
@@ -56,23 +18,10 @@ export default {
   name: 'Header',
   data () {
     return {
-      navbarCollapsed: false,
       query: ''
     }
   },
   computed: {
-    nodeSelectLabel () {
-      if (this.$net.xrpl) {
-        return 'Xrpl Mainnet (Change)'
-      }
-      if (this.$net.xahau_test) {
-        return 'Xahau Testnet (Change)'
-      }
-      if (this.$net.local) {
-        return 'Local (Change)'
-      }
-      return 'Xahau Mainnet (Change)'
-    },
     validQuery () {
       const commands = this.$router.options.routes.filter(r => {
         return r?.meta?.isPublicCommand && r.name.slice(0, 1) !== '_'
@@ -85,19 +34,15 @@ export default {
       }
 
       if (query.match(/^[A-F0-9]{16}/i)) {
-        // CTID
         return query
       }
       if (query.match(/^r[a-zA-Z0-9]{15,}/)) {
-        // XRPL account address
         return query
       }
       if (query.match(/^[a-fA-F0-9]{64}/)) {
-        // Ledger / TX / Object hash
         return query
       }
       if (query.match(/^[0-9]{1,}/) && Number(query) >= 1) {
-        // Ledger Index, XRPL > 32570, but other networks probably have real full history
         return query
       }
       const possibleCommands = commands.filter(c => c.match(query.toLowerCase()))
@@ -107,8 +52,6 @@ export default {
 
       return false
     }
-  },
-  components: {
   },
   methods: {
     search (e) {
@@ -124,15 +67,12 @@ export default {
           navTo = '/' + this.validQuery[0]
         }
         if (this.validQuery.length > 1) {
-          console.log(this.validQuery)
           navTo = '/command'
-          // console.log(this.validQuery)
           Object.assign(navQuery, {
             c: this.validQuery
           })
         }
       }
-      console.log(navTo)
       if (
         navTo &&
         (
@@ -151,11 +91,24 @@ export default {
       }
       return false
     }
-  },
-  mounted () {
   }
 }
 </script>
 
 <style lang="scss" scoped>
+  .navbar {
+    padding: 0.5rem 1rem;
+  }
+  .brand-text {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #38bdf8;
+    text-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+    letter-spacing: 0.05em;
+
+    small {
+      color: #64748b;
+      font-weight: 400;
+    }
+  }
 </style>
