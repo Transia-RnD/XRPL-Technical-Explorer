@@ -24,7 +24,7 @@
               <li><a class="dropdown-item" href="https://xahau-test.network">Xahau Testnet</a></li>
               <li><a class="dropdown-item" href="https://explorer.xrplf.org"><b>Xrpl Mainnet</b></a></li>
               <li><a class="dropdown-item" href="https://explorer-testnet.xrplf.org">Xrpl Testnet</a></li>
-              <li><a class="dropdown-item" href="http://localhost:4000"><b>Localhost (:6006)</b></a></li>
+              <li><a class="dropdown-item" href="/ws:local"><b>Localhost (:6006)</b></a></li>
             </ul>
           </li>
           <li class="nav-item">
@@ -69,7 +69,7 @@ export default {
         return 'Xahau Testnet (Change)'
       }
       if (this.$net.local) {
-        return 'Local (Change)'
+        return (this.$endpoint || 'Local') + ' (Change)'
       }
       return 'Xahau Mainnet (Change)'
     },
