@@ -28,6 +28,6 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 ARG PORT
 EXPOSE $PORT
 
-RUN sed -i "s/listen  .*/listen ${PORT};/g" /etc/nginx/conf.d/default.conf
+RUN sed -i -e "s/listen  .*/listen ${PORT};/g" -e "1i server_tokens off;" /etc/nginx/conf.d/default.conf
 
 # docker run --name technical-explorer -p 4000:4000 --rm transia/explorer-main
